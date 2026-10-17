@@ -486,22 +486,28 @@ Analyze this conflict and respond in JSON with:
 }
 `;
 
-    const response = await aiClient.models.generateContent({
-      model: process.env.GEMINI_MODEL || "gemini-2.5-flash",
-      contents: prompt,
-    });
-
     let resultJson: any;
     try {
+      const response = await aiClient.models.generateContent({
+        model: process.env.GEMINI_MODEL || "gemini-2.5-flash",
+        contents: prompt,
+      });
+
       const text = response.text || "";
       const cleaned = text.replace(/```json/g, "").replace(/```/g, "").trim();
       resultJson = JSON.parse(cleaned);
-    } catch {
+    } catch (aiErr: any) {
       resultJson = {
-        summary: response.text || finding.explanation,
-        compatibleStrategy: "Coordinate contract versioning across active sessions.",
-        recommendedTests: ["Run consumer contract tests"],
+        summary: `[Deterministic Fallback] ${finding.explanation}`,
+        compatibleStrategy:
+          "Keep existing interface contract intact or version the endpoint to prevent breaking active consumers.",
+        recommendedTests: [
+          "Run integration test suite for downstream consumers",
+          "Verify type checking on API contracts",
+        ],
         confidence: 0.9,
+        source: "deterministic_rules",
+        warning: `AI provider unavailable: ${aiErr.message}`,
       };
     }
 

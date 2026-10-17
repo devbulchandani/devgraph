@@ -50,4 +50,23 @@ describe("DevGraphDatabase FalkorDB Layer", () => {
     );
     expect(res.data[0][0]).toBe(1);
   });
+
+  it("connects to live FalkorDB instance and executes real graph query", async () => {
+    const liveDb = new DevGraphDatabase({
+      host: "127.0.0.1",
+      port: 6379,
+      graphId: "test-live-devgraph",
+    });
+
+    const health = await liveDb.healthCheck();
+    expect(health.status).toBe("healthy");
+    expect(health.latencyMs).toBeDefined();
+
+    // Execute real Cypher query in FalkorDB
+    const res = await liveDb.query("CREATE (n:TestNode {name: 'LiveNode'}) RETURN n.name AS name");
+    expect(res).toBeDefined();
+
+    await liveDb.clearGraph();
+    await liveDb.disconnect();
+  });
 });
