@@ -1,0 +1,13 @@
+{
+  "name": "sample-auth-service",
+  "version": "1.0.0",
+  "description": "Sample target repository for DevGraph multi-agent coordination demo",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
