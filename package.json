@@ -1,0 +1,28 @@
+{
+  "name": "devgraph-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "DevGraph - One shared brain for every developer and coding agent",
+  "scripts": {
+    "build": "pnpm -r run build",
+    "dev:falkor": "docker compose up -d",
+    "stop:falkor": "docker compose down",
+    "dev:server": "pnpm --filter @devgraph/server dev",
+    "dev:web": "pnpm --filter @devgraph/web dev",
+    "dev:mcp": "pnpm --filter @devgraph/mcp dev",
+    "start:mcp": "pnpm --filter @devgraph/mcp start",
+    "test": "vitest run",
+    "typecheck": "pnpm -r run typecheck",
+    "demo": "tsx scripts/run-two-agent-demo.ts"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "@types/node": "^22.10.1",
+    "@types/supertest": "^6.0.2",
+    "supertest": "^7.0.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "packageManager": "pnpm@9.12.1"
+}
