@@ -1341,7 +1341,7 @@ export default function App() {
       "command": "npx",
       "args": [
         "tsx",
-        "/absolute/path/to/DevGraph/apps/mcp/src/index.ts"
+        "/Users/devbulchandani/DevGraph/apps/mcp/src/index.ts"
       ],
       "env": {
         "FALKORDB_HOST": "127.0.0.1",
@@ -1358,7 +1358,7 @@ export default function App() {
   "mcpServers": {
     "devgraph": {
       "command": "npx",
-      "args": ["tsx", "/absolute/path/to/DevGraph/apps/mcp/src/index.ts"],
+      "args": ["tsx", "/Users/devbulchandani/DevGraph/apps/mcp/src/index.ts"],
       "env": {
         "FALKORDB_HOST": "127.0.0.1",
         "FALKORDB_PORT": "6379",
@@ -1394,7 +1394,7 @@ export default function App() {
       "command": "npx",
       "args": [
         "tsx",
-        "/absolute/path/to/DevGraph/apps/mcp/src/index.ts"
+        "/Users/devbulchandani/DevGraph/apps/mcp/src/index.ts"
       ],
       "env": {
         "FALKORDB_HOST": "127.0.0.1",
@@ -1411,7 +1411,7 @@ export default function App() {
   "mcpServers": {
     "devgraph": {
       "command": "npx",
-      "args": ["tsx", "/absolute/path/to/DevGraph/apps/mcp/src/index.ts"],
+      "args": ["tsx", "/Users/devbulchandani/DevGraph/apps/mcp/src/index.ts"],
       "env": {
         "FALKORDB_HOST": "127.0.0.1",
         "FALKORDB_PORT": "6379",
@@ -1447,7 +1447,7 @@ export default function App() {
       "command": "npx",
       "args": [
         "tsx",
-        "/absolute/path/to/DevGraph/apps/mcp/src/index.ts"
+        "/Users/devbulchandani/DevGraph/apps/mcp/src/index.ts"
       ],
       "env": {
         "FALKORDB_HOST": "127.0.0.1",
@@ -1464,7 +1464,7 @@ export default function App() {
   "mcpServers": {
     "devgraph": {
       "command": "npx",
-      "args": ["tsx", "/absolute/path/to/DevGraph/apps/mcp/src/index.ts"],
+      "args": ["tsx", "/Users/devbulchandani/DevGraph/apps/mcp/src/index.ts"],
       "env": {
         "FALKORDB_HOST": "127.0.0.1",
         "FALKORDB_PORT": "6379",
@@ -1484,21 +1484,57 @@ export default function App() {
                   </button>
                 </div>
 
-                {/* Kiro (this AI) */}
+                {/* Kiro */}
                 <div className="rounded-xl bg-[#111827] border border-[#1f2937] p-6">
                   <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
                     <Terminal className="w-5 h-5 text-emerald-400" />
-                    Kiro (Built-in)
+                    Kiro
                   </h3>
                   <p className="text-xs text-slate-400 mb-4">
-                    Kiro has native MCP support. No additional configuration needed!
+                    Add to Kiro's MCP settings: <code className="px-1.5 py-0.5 rounded bg-[#0b0f19] text-blue-300">~/.kiro/settings/mcp.json</code>
                   </p>
-                  <div className="p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-300">
-                    <strong>✓ Ready to use</strong>
-                    <p className="mt-1 text-slate-400">
-                      Simply ask Kiro to use DevGraph MCP tools and they'll work automatically. Example: "Use DevGraph announce_work to register my session"
-                    </p>
-                  </div>
+                  <pre className="p-3 rounded-lg bg-[#0b0f19] border border-[#1e293b] text-[11px] font-mono text-slate-300 overflow-x-auto">
+{`{
+  "mcpServers": {
+    "devgraph": {
+      "command": "npx",
+      "args": [
+        "tsx",
+        "/Users/devbulchandani/DevGraph/apps/mcp/src/index.ts"
+      ],
+      "env": {
+        "FALKORDB_HOST": "127.0.0.1",
+        "FALKORDB_PORT": "6379",
+        "FALKORDB_GRAPH_ID": "devgraph"
+      }
+    }
+  }
+}`}
+                  </pre>
+                  <button
+                    onClick={() => {
+                      const config = `{
+  "mcpServers": {
+    "devgraph": {
+      "command": "npx",
+      "args": ["tsx", "/Users/devbulchandani/DevGraph/apps/mcp/src/index.ts"],
+      "env": {
+        "FALKORDB_HOST": "127.0.0.1",
+        "FALKORDB_PORT": "6379",
+        "FALKORDB_GRAPH_ID": "devgraph"
+      }
+    }
+  }
+}`;
+                      navigator.clipboard.writeText(config);
+                      setActionMessage("Copied to clipboard!");
+                      setTimeout(() => setActionMessage(null), 2000);
+                    }}
+                    className="mt-3 w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 text-xs font-medium border border-emerald-500/30 transition-colors"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                    Copy Configuration
+                  </button>
                 </div>
               </div>
 
@@ -1513,33 +1549,40 @@ export default function App() {
                   <div className="flex items-start gap-3">
                     <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs font-bold">1</span>
                     <div>
-                      <strong className="text-white">Replace the path:</strong> Change <code className="px-1.5 py-0.5 rounded bg-[#0b0f19] text-blue-300 text-xs">/absolute/path/to/DevGraph</code> to your actual DevGraph installation path
+                      <strong className="text-white">Copy configuration:</strong> Click the "Copy Configuration" button for your agent (Claude, Antigravity, Cursor, or Kiro)
                     </div>
                   </div>
                   
                   <div className="flex items-start gap-3">
                     <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs font-bold">2</span>
                     <div>
-                      <strong className="text-white">Configure project:</strong> Set your project ID and repository path in the dashboard (click project name in sidebar)
+                      <strong className="text-white">Paste configuration:</strong> Add the copied JSON to your agent's MCP config file (paths shown above)
                     </div>
                   </div>
                   
                   <div className="flex items-start gap-3">
                     <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs font-bold">3</span>
                     <div>
-                      <strong className="text-white">Index repository:</strong> Click "1. Index Repo" button in the header to populate the graph
+                      <strong className="text-white">Configure project:</strong> Set your project ID and repository path in the dashboard (click project name in sidebar)
                     </div>
                   </div>
                   
                   <div className="flex items-start gap-3">
                     <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs font-bold">4</span>
                     <div>
-                      <strong className="text-white">Restart your agent:</strong> Close and reopen Claude Desktop / Antigravity / Cursor for MCP changes to take effect
+                      <strong className="text-white">Index repository:</strong> Click "1. Index Repo" button in the header to populate the graph
                     </div>
                   </div>
                   
                   <div className="flex items-start gap-3">
                     <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs font-bold">5</span>
+                    <div>
+                      <strong className="text-white">Restart your agent:</strong> Close and reopen your agent for MCP changes to take effect
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs font-bold">6</span>
                     <div>
                       <strong className="text-white">Test connection:</strong> Ask your agent to list available MCP tools - DevGraph tools should appear
                     </div>
