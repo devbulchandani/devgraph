@@ -19,6 +19,7 @@ import {
   Network,
   Play,
   RefreshCw,
+  Settings,
   ShieldAlert,
   Sparkles,
   Terminal,
@@ -53,7 +54,10 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<
     "overview" | "graph" | "conflicts" | "activity"
   >("overview");
-  const [projectId, setProjectId] = useState("sample-auth-service");
+  const [projectId, setProjectId] = useState("");
+  const [customProjectId, setCustomProjectId] = useState("");
+  const [customRepoPath, setCustomRepoPath] = useState("");
+  const [showProjectConfig, setShowProjectConfig] = useState(false);
   const [overview, setOverview] = useState<OverviewData | null>(null);
   const [health, setHealth] = useState<HealthData | null>(null);
   const [events, setEvents] = useState<any[]>([]);
@@ -101,11 +105,28 @@ export default function App() {
     }
   };
 
+  // Load saved project from localStorage
   useEffect(() => {
-    fetchData();
-    fetchGraph();
-    const interval = setInterval(fetchData, 4000);
-    return () => clearInterval(interval);
+    const saved = localStorage.getItem("devgraph-project");
+    if (saved) {
+      try {
+        const { projectId: savedId } = JSON.parse(saved);
+        setProjectId(savedId || "sample-auth-service");
+      } catch {
+        setProjectId("sample-auth-service");
+      }
+    } else {
+      setProjectId("sample-auth-service");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (projectId) {
+      fetchData();
+      fetchGraph();
+      const interval = setInterval(fetchData, 4000);
+      return () => clearInterval(interval);
+    }
   }, [projectId]);
 
   // Connect to SSE for Live Updates
@@ -239,17 +260,46 @@ export default function App() {
     }
   }, [activeTab, graphData]);
 
+  // Save project configuration
+  const saveProjectConfig = () => {
+    if (!customProjectId.trim()) {
+      alert("Please enter a project ID");
+      return;
+    }
+    
+    const config = {
+      projectId: customProjectId,
+      repoPath: customRepoPath || "demo/sample-repo",
+    };
+    
+    localStorage.setItem("devgraph-project", JSON.stringify(config));
+    setProjectId(customProjectId);
+    setShowProjectConfig(false);
+    setActionMessage(`Project switched to: ${customProjectId}`);
+  };
+
   // Action: Trigger Indexing
   const triggerIndex = async () => {
     setIsRunningAction(true);
-    setActionMessage("Indexing demo/sample-repo into FalkorDB...");
+    
+    // Get repo path from localStorage
+    let repoPath = "demo/sample-repo";
+    const saved = localStorage.getItem("devgraph-project");
+    if (saved) {
+      try {
+        const config = JSON.parse(saved);
+        repoPath = config.repoPath || "demo/sample-repo";
+      } catch {}
+    }
+    
+    setActionMessage(`Indexing ${repoPath} into FalkorDB...`);
     try {
       const res = await fetch(`/api/projects/${projectId}/index`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          repoPath: "demo/sample-repo",
-          repositoryId: "sample-auth-repo",
+          repoPath: repoPath,
+          repositoryId: `${projectId}-repo`,
         }),
       });
       const data = await res.json();
@@ -407,10 +457,24 @@ export default function App() {
             <label className="text-[11px] font-medium text-slate-400 uppercase tracking-wider block mb-1.5">
               Active Project
             </label>
-            <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-[#162032] border border-[#1e293b] text-sm text-slate-200 font-mono">
+            <button
+              onClick={() => {
+                setShowProjectConfig(true);
+                setCustomProjectId(projectId);
+                const saved = localStorage.getItem("devgraph-project");
+                if (saved) {
+                  try {
+                    const { repoPath } = JSON.parse(saved);
+                    setCustomRepoPath(repoPath || "");
+                  } catch {}
+                }
+              }}
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-md bg-[#162032] border border-[#1e293b] hover:border-blue-500/50 text-sm text-slate-200 font-mono transition-colors group"
+            >
               <GitBranch className="w-4 h-4 text-blue-400" />
-              <span className="truncate">{projectId}</span>
-            </div>
+              <span className="truncate flex-1 text-left">{projectId || "No Project"}</span>
+              <span className="text-[10px] text-slate-500 group-hover:text-blue-400">Edit</span>
+            </button>
           </div>
 
           {/* Nav Links */}
@@ -1015,6 +1079,76 @@ export default function App() {
           )}
         </div>
       </main>
+
+      {/* Project Configuration Modal */}
+      {showProjectConfig && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-6">
+          <div className="bg-[#0d1322] border border-[#1e293b] rounded-xl shadow-2xl max-w-md w-full p-6 space-y-5 animate-fade-in">
+            <div className="flex items-center justify-between border-b border-[#1e293b] pb-4">
+              <h2 className="text-lg font-bold text-white">Configure Project</h2>
+              <button
+                onClick={() => setShowProjectConfig(false)}
+                className="text-slate-400 hover:text-white transition-colors"
+              >
+                <span className="text-2xl leading-none">×</span>
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">
+                  Project ID <span className="text-red-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={customProjectId}
+                  onChange={(e) => setCustomProjectId(e.target.value)}
+                  placeholder="e.g., my-web-app"
+                  className="w-full px-3 py-2 bg-[#162032] border border-[#1e293b] rounded-lg text-slate-200 placeholder-slate-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-mono text-sm"
+                />
+                <p className="mt-1.5 text-xs text-slate-400">
+                  Unique identifier for this project in DevGraph
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">
+                  Repository Path (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={customRepoPath}
+                  onChange={(e) => setCustomRepoPath(e.target.value)}
+                  placeholder="e.g., ../my-project or /absolute/path"
+                  className="w-full px-3 py-2 bg-[#162032] border border-[#1e293b] rounded-lg text-slate-200 placeholder-slate-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-mono text-sm"
+                />
+                <p className="mt-1.5 text-xs text-slate-400">
+                  Path to your repository for indexing. Leave empty to use default demo.
+                </p>
+              </div>
+
+              <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 text-xs text-blue-200">
+                <strong>Tip:</strong> After configuring, click "1. Index Repo" in the header to index your codebase into FalkorDB.
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <button
+                onClick={() => setShowProjectConfig(false)}
+                className="flex-1 px-4 py-2.5 rounded-lg bg-[#1e293b] hover:bg-[#334155] text-slate-200 font-medium transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={saveProjectConfig}
+                className="flex-1 px-4 py-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium transition-all shadow-lg shadow-blue-500/20"
+              >
+                Save & Apply
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
