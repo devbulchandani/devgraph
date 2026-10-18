@@ -205,41 +205,49 @@ export default function App() {
             selector: "node",
             style: {
               label: "data(label)",
-              color: "#f8fafc",
-              "font-size": "12px",
-              "font-weight": 500,
+              color: "#ffffff",
+              "font-size": "11px",
+              "font-weight": 600,
               "font-family": "Plus Jakarta Sans, sans-serif",
               "text-valign": "center",
               "text-halign": "center",
               "text-wrap": "wrap",
-              "text-max-width": "100px",
+              "text-max-width": "80px",
               "background-color": "data(color)",
-              width: 60,
-              height: 60,
-              "border-width": 3,
-              "border-color": "#1e293b",
-              "border-opacity": 0.8,
+              width: 50,
+              height: 50,
+              "border-width": 2.5,
+              "border-color": "#0b0f19",
+              "border-opacity": 1,
               "text-outline-color": "#0b0f19",
-              "text-outline-width": 2,
+              "text-outline-width": 2.5,
+              "overlay-opacity": 0,
             },
           },
           {
             selector: "edge",
             style: {
-              label: "data(label)",
-              "font-size": "9px",
+              label: "",  // Hide edge labels to reduce clutter
+              "font-size": "8px",
               "font-family": "JetBrains Mono, monospace",
               color: "#64748b",
-              width: 2,
+              width: 1.5,
               "line-color": "#334155",
               "target-arrow-color": "#334155",
               "target-arrow-shape": "triangle",
+              "arrow-scale": 0.8,
               "curve-style": "bezier",
-              "text-rotation": "autorotate",
-              "text-background-color": "#0b0f19",
-              "text-background-opacity": 0.8,
-              "text-background-padding": "3px",
-              opacity: 0.7,
+              opacity: 0.6,
+            },
+          },
+          {
+            selector: "edge[relType]",
+            style: {
+              "line-style": (ele: any) => {
+                const relType = ele.data("relType");
+                if (relType === "IMPORTS" || relType === "DEPENDS_ON") return "dashed";
+                return "solid";
+              },
             },
           },
           {
@@ -250,33 +258,43 @@ export default function App() {
               "line-color": "#60a5fa",
               "target-arrow-color": "#60a5fa",
               opacity: 1,
+              "z-index": 999,
             },
           },
           {
             selector: "node:active",
             style: {
               "overlay-color": "#60a5fa",
-              "overlay-padding": 8,
-              "overlay-opacity": 0.3,
+              "overlay-padding": 6,
+              "overlay-opacity": 0.2,
+            },
+          },
+          {
+            selector: "edge:selected",
+            style: {
+              width: 3,
+              "z-index": 999,
             },
           },
         ],
         layout: {
           name: "cose",
           animate: true,
-          animationDuration: 500,
-          animationEasing: "ease-out",
-          nodeRepulsion: () => 8000,
-          idealEdgeLength: () => 120,
-          edgeElasticity: () => 100,
-          gravity: 0.1,
-          numIter: 1000,
+          animationDuration: 400,
+          animationEasing: "ease-in-out",
+          nodeRepulsion: () => 12000,
+          idealEdgeLength: () => 150,
+          edgeElasticity: () => 120,
+          gravity: 0.05,
+          numIter: 1200,
           fit: true,
-          padding: 50,
+          padding: 60,
+          randomize: false,
+          componentSpacing: 100,
         },
-        minZoom: 0.3,
-        maxZoom: 3,
-        wheelSensitivity: 0.2,
+        minZoom: 0.2,
+        maxZoom: 2.5,
+        wheelSensitivity: 0.15,
       });
 
       cyInstance.current.on("tap", "node", (evt) => {
@@ -876,35 +894,45 @@ export default function App() {
                   </div>
 
                   {/* Graph Legend */}
-                  <div className="absolute top-4 left-4 z-10 p-3.5 rounded-lg bg-[#0b0f19]/95 border border-[#1e293b] backdrop-blur-xl shadow-xl">
-                    <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Node Types</div>
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
+                  <div className="absolute top-4 left-4 z-10 p-3.5 rounded-lg bg-[#0b0f19]/95 border border-[#1e293b] backdrop-blur-xl shadow-xl max-w-xs">
+                    <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2.5">Node Types</div>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs mb-3">
                       <span className="flex items-center gap-2">
-                        <span className="w-3 h-3 rounded-full bg-[#10b981] border-2 border-[#1e293b]" />
+                        <span className="w-3 h-3 rounded-full bg-[#10b981] border-2 border-[#0b0f19]" />
                         <span className="text-slate-300">File</span>
                       </span>
                       <span className="flex items-center gap-2">
-                        <span className="w-3 h-3 rounded-full bg-[#06b6d4] border-2 border-[#1e293b]" />
+                        <span className="w-3 h-3 rounded-full bg-[#06b6d4] border-2 border-[#0b0f19]" />
                         <span className="text-slate-300">Function</span>
                       </span>
                       <span className="flex items-center gap-2">
-                        <span className="w-3 h-3 rounded-full bg-[#8b5cf6] border-2 border-[#1e293b]" />
+                        <span className="w-3 h-3 rounded-full bg-[#8b5cf6] border-2 border-[#0b0f19]" />
                         <span className="text-slate-300">Class</span>
                       </span>
                       <span className="flex items-center gap-2">
-                        <span className="w-3 h-3 rounded-full bg-[#ec4899] border-2 border-[#1e293b]" />
+                        <span className="w-3 h-3 rounded-full bg-[#ec4899] border-2 border-[#0b0f19]" />
                         <span className="text-slate-300">Interface</span>
                       </span>
                       <span className="flex items-center gap-2">
-                        <span className="w-3 h-3 rounded-full bg-[#f59e0b] border-2 border-[#1e293b]" />
+                        <span className="w-3 h-3 rounded-full bg-[#f59e0b] border-2 border-[#0b0f19]" />
                         <span className="text-slate-300">Contract</span>
                       </span>
                       <span className="flex items-center gap-2">
-                        <span className="w-3 h-3 rounded-full bg-[#e11d48] border-2 border-[#1e293b]" />
+                        <span className="w-3 h-3 rounded-full bg-[#e11d48] border-2 border-[#0b0f19]" />
                         <span className="text-slate-300">Session</span>
                       </span>
                     </div>
-                    <div className="mt-2 pt-2 border-t border-[#1e293b]/60 text-[10px] text-slate-500">
+                    <div className="border-t border-[#1e293b]/60 pt-2 text-[10px] space-y-1">
+                      <div className="flex items-center gap-2 text-slate-400">
+                        <div className="w-8 h-0.5 bg-[#334155]"></div>
+                        <span>Solid: Contains/Uses</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-slate-400">
+                        <div className="w-8 h-0.5 bg-[#334155] border-dashed" style={{ borderTop: "1.5px dashed #334155", background: "none" }}></div>
+                        <span>Dashed: Imports/Deps</span>
+                      </div>
+                    </div>
+                    <div className="mt-2 pt-2 border-t border-[#1e293b]/60 text-[10px] text-slate-500 font-mono">
                       {graphData.nodes.length} nodes • {graphData.edges.length} edges
                     </div>
                   </div>
