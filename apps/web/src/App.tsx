@@ -151,7 +151,7 @@ export default function App() {
 
   // Initialize Cytoscape when on graph tab
   useEffect(() => {
-    if (activeTab === "graph" && cyRef.current) {
+    if (activeTab === "graph" && cyRef.current && graphData.nodes.length > 0) {
       if (cyInstance.current) {
         cyInstance.current.destroy();
       }
@@ -170,11 +170,12 @@ export default function App() {
         Decision: "#14b8a6",
       };
 
+      // Add nodes
       for (const n of graphData.nodes) {
         elements.push({
           data: {
             id: n.id,
-            label: n.label.length > 22 ? n.label.slice(0, 20) + "…" : n.label,
+            label: n.label.length > 30 ? n.label.slice(0, 28) + "…" : n.label,
             fullLabel: n.label,
             type: n.type,
             color: nodeColors[n.type] || "#94a3b8",
@@ -183,6 +184,7 @@ export default function App() {
         });
       }
 
+      // Add edges
       for (const e of graphData.edges) {
         elements.push({
           data: {
@@ -190,6 +192,7 @@ export default function App() {
             source: e.source,
             target: e.target,
             label: e.label,
+            relType: e.label,
           },
         });
       }
@@ -203,48 +206,77 @@ export default function App() {
             style: {
               label: "data(label)",
               color: "#f8fafc",
-              "font-size": "11px",
-              "font-family": "JetBrains Mono, monospace",
-              "text-valign": "bottom",
-              "text-margin-y": 5,
+              "font-size": "12px",
+              "font-weight": "500",
+              "font-family": "Plus Jakarta Sans, sans-serif",
+              "text-valign": "center",
+              "text-halign": "center",
+              "text-wrap": "wrap",
+              "text-max-width": "100px",
               "background-color": "data(color)",
-              width: 32,
-              height: 32,
-              "border-width": 2,
+              width: 60,
+              height: 60,
+              "border-width": 3,
               "border-color": "#1e293b",
+              "border-opacity": 0.8,
+              "text-outline-color": "#0b0f19",
+              "text-outline-width": 2,
             },
           },
           {
             selector: "edge",
             style: {
               label: "data(label)",
-              "font-size": "8px",
+              "font-size": "9px",
               "font-family": "JetBrains Mono, monospace",
-              color: "#94a3b8",
-              width: 1.5,
+              color: "#64748b",
+              width: 2,
               "line-color": "#334155",
               "target-arrow-color": "#334155",
               "target-arrow-shape": "triangle",
               "curve-style": "bezier",
               "text-rotation": "autorotate",
+              "text-background-color": "#0b0f19",
+              "text-background-opacity": 0.8,
+              "text-background-padding": "3px",
+              opacity: 0.7,
             },
           },
           {
             selector: ":selected",
             style: {
-              "border-color": "#38bdf8",
+              "border-color": "#60a5fa",
               "border-width": 4,
-              "line-color": "#38bdf8",
-              "target-arrow-color": "#38bdf8",
+              "line-color": "#60a5fa",
+              "target-arrow-color": "#60a5fa",
+              opacity: 1,
+            },
+          },
+          {
+            selector: "node:active",
+            style: {
+              "overlay-color": "#60a5fa",
+              "overlay-padding": 8,
+              "overlay-opacity": 0.3,
             },
           },
         ],
         layout: {
           name: "cose",
-          animate: false,
-          nodeRepulsion: () => 4500,
-          idealEdgeLength: () => 80,
+          animate: true,
+          animationDuration: 500,
+          animationEasing: "ease-out",
+          nodeRepulsion: () => 8000,
+          idealEdgeLength: () => 120,
+          edgeElasticity: () => 100,
+          gravity: 0.1,
+          numIter: 1000,
+          fit: true,
+          padding: 50,
         },
+        minZoom: 0.3,
+        maxZoom: 3,
+        wheelSensitivity: 0.2,
       });
 
       cyInstance.current.on("tap", "node", (evt) => {
@@ -803,58 +835,116 @@ export default function App() {
 
           {/* TAB: DEPENDENCY & WORK GRAPH */}
           {activeTab === "graph" && (
-            <div className="h-full flex flex-col rounded-xl bg-[#111827] border border-[#1f2937] overflow-hidden relative">
-              {/* Graph Legend */}
-              <div className="absolute top-4 left-4 z-10 p-3 rounded-lg bg-[#0b0f19]/90 border border-[#1e293b] backdrop-blur flex flex-wrap gap-3 text-xs">
-                <span className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#10b981]" /> File
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#06b6d4]" /> Function
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#f59e0b]" /> API Contract
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#e11d48]" /> Work Session
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#f97316]" /> Proposed Change
-                </span>
-              </div>
-
-              {/* Node Inspector Panel */}
-              {selectedNode && (
-                <div className="absolute top-4 right-4 z-10 w-80 p-4 rounded-xl bg-[#0d1322]/95 border border-[#1e293b] backdrop-blur text-xs space-y-2 shadow-2xl">
-                  <div className="flex items-center justify-between border-b border-[#1e293b] pb-2">
-                    <span className="font-mono font-bold text-white uppercase text-[11px]">
-                      {selectedNode.type}
-                    </span>
-                    <button
-                      onClick={() => setSelectedNode(null)}
-                      className="text-slate-400 hover:text-white"
-                    >
-                      ×
-                    </button>
-                  </div>
-                  <div className="font-mono text-slate-200 text-sm font-semibold break-all">
-                    {selectedNode.fullLabel}
-                  </div>
-                  <div className="max-h-60 overflow-y-auto space-y-1.5 text-slate-400 pt-1 font-mono text-[11px]">
-                    {Object.entries(selectedNode.properties || {}).map(([k, v]) => (
-                      <div key={k} className="border-b border-[#1e293b]/50 pb-1">
-                        <span className="text-slate-500">{k}: </span>
-                        <span className="text-slate-300">
-                          {typeof v === "object" ? JSON.stringify(v) : String(v)}
-                        </span>
-                      </div>
-                    ))}
+            <div className="h-full flex flex-col">
+              {graphData.nodes.length === 0 ? (
+                <div className="flex-1 flex items-center justify-center rounded-xl bg-[#111827] border border-[#1f2937]">
+                  <div className="text-center space-y-4 max-w-md">
+                    <div className="w-16 h-16 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mx-auto">
+                      <Network className="w-8 h-8 text-blue-400" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white">No Graph Data</h3>
+                    <p className="text-sm text-slate-400">
+                      Index your repository to visualize the dependency graph. Click "1. Index Repo" in the header to get started.
+                    </p>
                   </div>
                 </div>
-              )}
+              ) : (
+                <div className="h-full flex flex-col rounded-xl bg-[#111827] border border-[#1f2937] overflow-hidden relative">
+                  {/* Graph Controls */}
+                  <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
+                    <button
+                      onClick={() => cyInstance.current?.fit(50)}
+                      className="p-2 rounded-lg bg-[#0b0f19]/90 border border-[#1e293b] backdrop-blur hover:bg-[#162032] transition-colors"
+                      title="Fit to view"
+                    >
+                      <Layers className="w-4 h-4 text-blue-400" />
+                    </button>
+                    <button
+                      onClick={() => cyInstance.current?.zoom(cyInstance.current.zoom() * 1.2)}
+                      className="p-2 rounded-lg bg-[#0b0f19]/90 border border-[#1e293b] backdrop-blur hover:bg-[#162032] transition-colors text-slate-300 text-sm font-bold"
+                      title="Zoom in"
+                    >
+                      +
+                    </button>
+                    <button
+                      onClick={() => cyInstance.current?.zoom(cyInstance.current.zoom() * 0.8)}
+                      className="p-2 rounded-lg bg-[#0b0f19]/90 border border-[#1e293b] backdrop-blur hover:bg-[#162032] transition-colors text-slate-300 text-sm font-bold"
+                      title="Zoom out"
+                    >
+                      −
+                    </button>
+                  </div>
 
-              {/* Cytoscape Canvas */}
-              <div ref={cyRef} className="w-full h-full min-h-[600px]" />
+                  {/* Graph Legend */}
+                  <div className="absolute top-4 left-4 z-10 p-3.5 rounded-lg bg-[#0b0f19]/95 border border-[#1e293b] backdrop-blur-xl shadow-xl">
+                    <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Node Types</div>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
+                      <span className="flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full bg-[#10b981] border-2 border-[#1e293b]" />
+                        <span className="text-slate-300">File</span>
+                      </span>
+                      <span className="flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full bg-[#06b6d4] border-2 border-[#1e293b]" />
+                        <span className="text-slate-300">Function</span>
+                      </span>
+                      <span className="flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full bg-[#8b5cf6] border-2 border-[#1e293b]" />
+                        <span className="text-slate-300">Class</span>
+                      </span>
+                      <span className="flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full bg-[#ec4899] border-2 border-[#1e293b]" />
+                        <span className="text-slate-300">Interface</span>
+                      </span>
+                      <span className="flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full bg-[#f59e0b] border-2 border-[#1e293b]" />
+                        <span className="text-slate-300">Contract</span>
+                      </span>
+                      <span className="flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full bg-[#e11d48] border-2 border-[#1e293b]" />
+                        <span className="text-slate-300">Session</span>
+                      </span>
+                    </div>
+                    <div className="mt-2 pt-2 border-t border-[#1e293b]/60 text-[10px] text-slate-500">
+                      {graphData.nodes.length} nodes • {graphData.edges.length} edges
+                    </div>
+                  </div>
+
+                  {/* Node Inspector Panel */}
+                  {selectedNode && (
+                    <div className="absolute bottom-4 left-4 z-10 w-80 p-4 rounded-xl bg-[#0d1322]/95 border border-[#1e293b] backdrop-blur-xl text-xs space-y-3 shadow-2xl">
+                      <div className="flex items-center justify-between border-b border-[#1e293b] pb-2">
+                        <span className="font-mono font-bold text-white uppercase text-[11px]">
+                          {selectedNode.type}
+                        </span>
+                        <button
+                          onClick={() => setSelectedNode(null)}
+                          className="text-slate-400 hover:text-white transition-colors text-xl leading-none"
+                        >
+                          ×
+                        </button>
+                      </div>
+                      <div className="font-mono text-slate-200 text-sm font-semibold break-all">
+                        {selectedNode.fullLabel}
+                      </div>
+                      {selectedNode.properties && Object.keys(selectedNode.properties).length > 0 && (
+                        <div className="max-h-48 overflow-y-auto space-y-1.5 text-slate-400 pt-1 font-mono text-[11px]">
+                          {Object.entries(selectedNode.properties).map(([k, v]) => (
+                            <div key={k} className="border-b border-[#1e293b]/50 pb-1">
+                              <span className="text-slate-500">{k}: </span>
+                              <span className="text-slate-300">
+                                {typeof v === "object" ? JSON.stringify(v) : String(v)}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Cytoscape Canvas */}
+                  <div ref={cyRef} className="w-full h-full min-h-[600px]" />
+                </div>
+              )}
             </div>
           )}
 
