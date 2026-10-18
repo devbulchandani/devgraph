@@ -207,7 +207,7 @@ export default function App() {
               label: "data(label)",
               color: "#f8fafc",
               "font-size": "12px",
-              "font-weight": "500",
+              "font-weight": 500,
               "font-family": "Plus Jakarta Sans, sans-serif",
               "text-valign": "center",
               "text-halign": "center",
@@ -853,7 +853,7 @@ export default function App() {
                   {/* Graph Controls */}
                   <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
                     <button
-                      onClick={() => cyInstance.current?.fit(50)}
+                      onClick={() => cyInstance.current?.fit()}
                       className="p-2 rounded-lg bg-[#0b0f19]/90 border border-[#1e293b] backdrop-blur hover:bg-[#162032] transition-colors"
                       title="Fit to view"
                     >
