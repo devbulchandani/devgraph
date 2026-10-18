@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import cytoscape from "cytoscape";
+import LandingPage from "./LandingPage";
 import {
   Activity,
   AlertTriangle,
@@ -12,6 +13,7 @@ import {
   GitBranch,
   GitCommit,
   GitPullRequest,
+  Home,
   Layers,
   LayoutDashboard,
   Network,
@@ -47,6 +49,7 @@ interface HealthData {
 }
 
 export default function App() {
+  const [showLanding, setShowLanding] = useState(true);
   const [activeTab, setActiveTab] = useState<
     "overview" | "graph" | "conflicts" | "activity"
   >("overview");
@@ -373,6 +376,11 @@ export default function App() {
     }
   };
 
+  // Show landing page if requested
+  if (showLanding) {
+    return <LandingPage onEnterDashboard={() => setShowLanding(false)} />;
+  }
+
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-[#0b0f19] text-slate-200">
       {/* Sidebar Navigation */}
@@ -407,6 +415,16 @@ export default function App() {
 
           {/* Nav Links */}
           <nav className="p-3 space-y-1">
+            <button
+              onClick={() => setShowLanding(true)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-slate-400 hover:text-slate-200 hover:bg-[#162032] border border-transparent hover:border-[#1e293b]"
+            >
+              <Home className="w-4 h-4" />
+              Back to Home
+            </button>
+
+            <div className="h-px bg-[#1e293b]/60 my-2" />
+
             <button
               onClick={() => setActiveTab("overview")}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
