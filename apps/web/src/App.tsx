@@ -5,9 +5,12 @@ import {
   Activity,
   AlertTriangle,
   ArrowRight,
+  BookOpen,
   Brain,
   CheckCircle2,
   ChevronRight,
+  Code2,
+  Copy,
   Database,
   FileCode2,
   GitBranch,
@@ -18,6 +21,7 @@ import {
   LayoutDashboard,
   Network,
   Play,
+  Plug,
   RefreshCw,
   Settings,
   ShieldAlert,
@@ -52,7 +56,7 @@ interface HealthData {
 export default function App() {
   const [showLanding, setShowLanding] = useState(true);
   const [activeTab, setActiveTab] = useState<
-    "overview" | "graph" | "conflicts" | "activity"
+    "overview" | "graph" | "conflicts" | "activity" | "mcp-setup"
   >("overview");
   const [projectId, setProjectId] = useState("");
   const [customProjectId, setCustomProjectId] = useState("");
@@ -601,6 +605,20 @@ export default function App() {
                 </span>
               )}
             </button>
+
+            <div className="h-px bg-[#1e293b]/60 my-2" />
+
+            <button
+              onClick={() => setActiveTab("mcp-setup")}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                activeTab === "mcp-setup"
+                  ? "bg-purple-600/20 text-purple-400 border border-purple-500/30"
+                  : "text-slate-400 hover:text-slate-200 hover:bg-[#162032]"
+              }`}
+            >
+              <Plug className="w-4 h-4" />
+              MCP Setup Guide
+            </button>
           </nav>
         </div>
 
@@ -653,6 +671,7 @@ export default function App() {
               {activeTab === "graph" && "Live Dependency & Work Subgraph"}
               {activeTab === "conflicts" && "Conflict & Semantic Risk Center"}
               {activeTab === "activity" && "Real-Time Agent Coordination Feed"}
+              {activeTab === "mcp-setup" && "MCP Integration Setup Guide"}
             </h2>
             {actionMessage && (
               <span className="text-xs px-2.5 py-1 rounded bg-blue-500/10 text-blue-300 border border-blue-500/30 animate-fade-in font-mono">
@@ -1193,6 +1212,357 @@ export default function App() {
                   No activity events recorded yet.
                 </div>
               )}
+            </div>
+          )}
+
+          {/* TAB: MCP SETUP GUIDE */}
+          {activeTab === "mcp-setup" && (
+            <div className="max-w-5xl mx-auto space-y-6">
+              {/* Header */}
+              <div className="rounded-xl bg-gradient-to-br from-purple-500/10 to-indigo-500/10 border border-purple-500/20 p-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center flex-shrink-0">
+                    <Plug className="w-6 h-6 text-purple-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-white mb-2">Model Context Protocol (MCP) Integration</h3>
+                    <p className="text-sm text-slate-300 leading-relaxed">
+                      Connect AI coding agents (Claude, Cursor, Kiro, Antigravity) to DevGraph for real-time coordination, 
+                      conflict detection, and shared repository memory. Follow the steps below to configure your agents.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Available Tools */}
+              <div className="rounded-xl bg-[#111827] border border-[#1f2937] p-6">
+                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                  <Code2 className="w-5 h-5 text-blue-400" />
+                  Available MCP Tools
+                </h3>
+                
+                <div className="space-y-4">
+                  {[
+                    {
+                      name: "get_coding_context",
+                      icon: "🔍",
+                      description: "Retrieve focused subgraph context including active sessions, uncommitted changes, and potential conflicts",
+                      params: ["project_id", "task_description", "files[]", "symbols[]"],
+                      use: "Before starting work to check for conflicts"
+                    },
+                    {
+                      name: "announce_work",
+                      icon: "📢",
+                      description: "Register an active work session with intended files and symbols, get immediate overlap detection",
+                      params: ["project_id", "agent_id", "task_description", "intended_files[]", "branch"],
+                      use: "At the start of any coding task"
+                    },
+                    {
+                      name: "publish_change",
+                      icon: "📝",
+                      description: "Publish uncommitted in-progress or intended changes before git commit for other agents to see",
+                      params: ["project_id", "session_id", "changed_files[]", "change_type", "diff"],
+                      use: "After making changes, before committing"
+                    },
+                    {
+                      name: "check_conflicts",
+                      icon: "⚠️",
+                      description: "Analyze proposed changes against active work for Categories A-E conflict risks with evidence",
+                      params: ["project_id", "session_id", "proposed_file_changes[]"],
+                      use: "Before finalizing implementation"
+                    },
+                    {
+                      name: "get_impact_analysis",
+                      icon: "🌐",
+                      description: "Trace downstream dependencies to understand blast radius and affected components",
+                      params: ["project_id", "file_path", "symbol_name"],
+                      use: "Planning refactors or breaking changes"
+                    },
+                    {
+                      name: "record_decision",
+                      icon: "📋",
+                      description: "Persist architectural decision records (ADRs) linked to contracts and components",
+                      params: ["project_id", "decision_title", "rationale", "affected_contracts[]"],
+                      use: "Documenting important architecture choices"
+                    },
+                    {
+                      name: "complete_work",
+                      icon: "✅",
+                      description: "Mark work session as completed, abandoned, or blocked to clean up active state",
+                      params: ["project_id", "session_id", "status"],
+                      use: "When finishing or pausing work"
+                    },
+                    {
+                      name: "reserve_resource",
+                      icon: "🔒",
+                      description: "Time-bounded coordination lease on critical shared files or schemas",
+                      params: ["project_id", "resource_identifier", "duration_minutes"],
+                      use: "Exclusive access to sensitive files"
+                    }
+                  ].map((tool) => (
+                    <div key={tool.name} className="p-4 rounded-lg bg-[#162032] border border-[#1e293b] hover:border-purple-500/30 transition-colors">
+                      <div className="flex items-start gap-3">
+                        <span className="text-2xl flex-shrink-0">{tool.icon}</span>
+                        <div className="flex-1">
+                          <div className="font-mono text-sm font-semibold text-blue-300 mb-1">{tool.name}</div>
+                          <p className="text-xs text-slate-400 mb-2">{tool.description}</p>
+                          <div className="flex flex-wrap gap-1.5 mb-2">
+                            {tool.params.map((param) => (
+                              <span key={param} className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#0b0f19] text-slate-400 border border-[#1e293b]">
+                                {param}
+                              </span>
+                            ))}
+                          </div>
+                          <div className="text-[11px] text-emerald-400">
+                            <strong>Use case:</strong> {tool.use}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Configuration Instructions */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Claude Desktop */}
+                <div className="rounded-xl bg-[#111827] border border-[#1f2937] p-6">
+                  <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+                    <Terminal className="w-5 h-5 text-orange-400" />
+                    Claude Desktop
+                  </h3>
+                  <p className="text-xs text-slate-400 mb-4">
+                    Add DevGraph to <code className="px-1.5 py-0.5 rounded bg-[#0b0f19] text-blue-300">claude_desktop_config.json</code>
+                  </p>
+                  <pre className="p-3 rounded-lg bg-[#0b0f19] border border-[#1e293b] text-[11px] font-mono text-slate-300 overflow-x-auto">
+{`{
+  "mcpServers": {
+    "devgraph": {
+      "command": "npx",
+      "args": [
+        "tsx",
+        "/absolute/path/to/DevGraph/apps/mcp/src/index.ts"
+      ],
+      "env": {
+        "FALKORDB_HOST": "127.0.0.1",
+        "FALKORDB_PORT": "6379",
+        "FALKORDB_GRAPH_ID": "devgraph"
+      }
+    }
+  }
+}`}
+                  </pre>
+                  <button
+                    onClick={() => {
+                      const config = `{
+  "mcpServers": {
+    "devgraph": {
+      "command": "npx",
+      "args": ["tsx", "/absolute/path/to/DevGraph/apps/mcp/src/index.ts"],
+      "env": {
+        "FALKORDB_HOST": "127.0.0.1",
+        "FALKORDB_PORT": "6379",
+        "FALKORDB_GRAPH_ID": "devgraph"
+      }
+    }
+  }
+}`;
+                      navigator.clipboard.writeText(config);
+                      setActionMessage("Copied to clipboard!");
+                      setTimeout(() => setActionMessage(null), 2000);
+                    }}
+                    className="mt-3 w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 text-xs font-medium border border-blue-500/30 transition-colors"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                    Copy Configuration
+                  </button>
+                </div>
+
+                {/* Antigravity CLI */}
+                <div className="rounded-xl bg-[#111827] border border-[#1f2937] p-6">
+                  <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+                    <Terminal className="w-5 h-5 text-purple-400" />
+                    Antigravity CLI
+                  </h3>
+                  <p className="text-xs text-slate-400 mb-4">
+                    Create <code className="px-1.5 py-0.5 rounded bg-[#0b0f19] text-blue-300">~/.antigravity/mcp.json</code>
+                  </p>
+                  <pre className="p-3 rounded-lg bg-[#0b0f19] border border-[#1e293b] text-[11px] font-mono text-slate-300 overflow-x-auto">
+{`{
+  "mcpServers": {
+    "devgraph": {
+      "command": "npx",
+      "args": [
+        "tsx",
+        "/absolute/path/to/DevGraph/apps/mcp/src/index.ts"
+      ],
+      "env": {
+        "FALKORDB_HOST": "127.0.0.1",
+        "FALKORDB_PORT": "6379",
+        "FALKORDB_GRAPH_ID": "devgraph"
+      }
+    }
+  }
+}`}
+                  </pre>
+                  <button
+                    onClick={() => {
+                      const config = `{
+  "mcpServers": {
+    "devgraph": {
+      "command": "npx",
+      "args": ["tsx", "/absolute/path/to/DevGraph/apps/mcp/src/index.ts"],
+      "env": {
+        "FALKORDB_HOST": "127.0.0.1",
+        "FALKORDB_PORT": "6379",
+        "FALKORDB_GRAPH_ID": "devgraph"
+      }
+    }
+  }
+}`;
+                      navigator.clipboard.writeText(config);
+                      setActionMessage("Copied to clipboard!");
+                      setTimeout(() => setActionMessage(null), 2000);
+                    }}
+                    className="mt-3 w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 text-xs font-medium border border-purple-500/30 transition-colors"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                    Copy Configuration
+                  </button>
+                </div>
+
+                {/* Cursor */}
+                <div className="rounded-xl bg-[#111827] border border-[#1f2937] p-6">
+                  <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+                    <Terminal className="w-5 h-5 text-cyan-400" />
+                    Cursor
+                  </h3>
+                  <p className="text-xs text-slate-400 mb-4">
+                    Add to Cursor's MCP settings (similar to Claude Desktop)
+                  </p>
+                  <pre className="p-3 rounded-lg bg-[#0b0f19] border border-[#1e293b] text-[11px] font-mono text-slate-300 overflow-x-auto">
+{`{
+  "mcpServers": {
+    "devgraph": {
+      "command": "npx",
+      "args": [
+        "tsx",
+        "/absolute/path/to/DevGraph/apps/mcp/src/index.ts"
+      ],
+      "env": {
+        "FALKORDB_HOST": "127.0.0.1",
+        "FALKORDB_PORT": "6379",
+        "FALKORDB_GRAPH_ID": "devgraph"
+      }
+    }
+  }
+}`}
+                  </pre>
+                  <button
+                    onClick={() => {
+                      const config = `{
+  "mcpServers": {
+    "devgraph": {
+      "command": "npx",
+      "args": ["tsx", "/absolute/path/to/DevGraph/apps/mcp/src/index.ts"],
+      "env": {
+        "FALKORDB_HOST": "127.0.0.1",
+        "FALKORDB_PORT": "6379",
+        "FALKORDB_GRAPH_ID": "devgraph"
+      }
+    }
+  }
+}`;
+                      navigator.clipboard.writeText(config);
+                      setActionMessage("Copied to clipboard!");
+                      setTimeout(() => setActionMessage(null), 2000);
+                    }}
+                    className="mt-3 w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-cyan-600/20 hover:bg-cyan-600/30 text-cyan-300 text-xs font-medium border border-cyan-500/30 transition-colors"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                    Copy Configuration
+                  </button>
+                </div>
+
+                {/* Kiro (this AI) */}
+                <div className="rounded-xl bg-[#111827] border border-[#1f2937] p-6">
+                  <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+                    <Terminal className="w-5 h-5 text-emerald-400" />
+                    Kiro (Built-in)
+                  </h3>
+                  <p className="text-xs text-slate-400 mb-4">
+                    Kiro has native MCP support. No additional configuration needed!
+                  </p>
+                  <div className="p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-300">
+                    <strong>✓ Ready to use</strong>
+                    <p className="mt-1 text-slate-400">
+                      Simply ask Kiro to use DevGraph MCP tools and they'll work automatically. Example: "Use DevGraph announce_work to register my session"
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Quick Start Guide */}
+              <div className="rounded-xl bg-[#111827] border border-[#1f2937] p-6">
+                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-blue-400" />
+                  Quick Start Guide
+                </h3>
+                
+                <div className="space-y-3 text-sm text-slate-300">
+                  <div className="flex items-start gap-3">
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs font-bold">1</span>
+                    <div>
+                      <strong className="text-white">Replace the path:</strong> Change <code className="px-1.5 py-0.5 rounded bg-[#0b0f19] text-blue-300 text-xs">/absolute/path/to/DevGraph</code> to your actual DevGraph installation path
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs font-bold">2</span>
+                    <div>
+                      <strong className="text-white">Configure project:</strong> Set your project ID and repository path in the dashboard (click project name in sidebar)
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs font-bold">3</span>
+                    <div>
+                      <strong className="text-white">Index repository:</strong> Click "1. Index Repo" button in the header to populate the graph
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs font-bold">4</span>
+                    <div>
+                      <strong className="text-white">Restart your agent:</strong> Close and reopen Claude Desktop / Antigravity / Cursor for MCP changes to take effect
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs font-bold">5</span>
+                    <div>
+                      <strong className="text-white">Test connection:</strong> Ask your agent to list available MCP tools - DevGraph tools should appear
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Important Notes */}
+              <div className="rounded-xl bg-amber-500/10 border border-amber-500/20 p-5">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                  <div className="space-y-2 text-xs text-amber-200">
+                    <p className="font-semibold text-amber-300">Important Notes:</p>
+                    <ul className="space-y-1 list-disc pl-4 text-slate-300">
+                      <li>Make sure DevGraph backend server is running: <code className="px-1 py-0.5 rounded bg-[#0b0f19] text-blue-300">pnpm dev:server</code></li>
+                      <li>FalkorDB must be running: <code className="px-1 py-0.5 rounded bg-[#0b0f19] text-blue-300">docker compose up -d</code></li>
+                      <li>Use absolute paths, not relative (e.g., <code className="px-1 py-0.5 rounded bg-[#0b0f19] text-blue-300">/Users/yourname/...</code>)</li>
+                      <li>All agents must use the same <code className="px-1 py-0.5 rounded bg-[#0b0f19] text-blue-300">project_id</code> to see each other's work</li>
+                      <li>MCP runs via stdio - check agent logs if tools don't appear</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </div>
