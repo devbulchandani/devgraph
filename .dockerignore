@@ -1,0 +1,54 @@
+# Node modules
+node_modules
+**/node_modules
+
+# Build outputs
+dist
+**/dist
+cdk.out
+**/cdk.out
+
+# Development files
+.git
+.github
+.vscode
+.idea
+*.md
+!README.md
+
+# Test files
+tests
+**/*.test.ts
+**/*.test.js
+
+# Documentation
+docs
+DEPLOYMENT.md
+QUICKSTART_DEPLOY.md
+
+# Demo
+demo
+
+# Infrastructure
+infrastructure
+
+# Environment files
+.env
+.env.*
+!.env.example
+!.env.production.example
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+*.swp
+*.swo
+*~

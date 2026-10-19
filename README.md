@@ -163,3 +163,86 @@ DevGraph classifies engineering risks into 5 deterministic categories:
 - [x] **Evidence-Backed Conflicts**: Traversal paths and diff citations with zero false certainty.
 - [x] **Compatible Change Non-Conflict**: Backward-compatible changes verified without false positive alerts.
 - [x] **100% Passing Automated Tests**: 18 tests covering all service boundaries.
+
+
+---
+
+## 🚀 AWS Deployment
+
+### Current Status
+
+✅ **AWS Setup Complete:**
+- AWS CLI authenticated with profile `devgraph`
+- AWS Agent Toolkit installed (24 AWS skills in `~/.kiro/skills`)
+- AWS MCP Server configured for Kiro
+- CDK environment bootstrapped in `us-east-1`
+- Infrastructure code ready in `infrastructure/`
+
+### Deployment Options
+
+#### Option 1: AWS CDK (Full Stack)
+
+The CDK infrastructure is ready but encountered permissions issues. To deploy:
+
+```bash
+cd infrastructure
+
+# Deploy frontend only (S3 + CloudFront)
+cdk deploy --profile devgraph
+
+# After resolving AWS permissions, deploy full stack:
+# - Switch to devgraph-stack.ts in cdk-app.ts
+# - Includes ECS Fargate + ElastiCache + ALB
+```
+
+**Note:** The root account may need additional IAM permissions or SCP adjustments for full deployment.
+
+#### Option 2: Docker Compose (Recommended for Now)
+
+Deploy immediately on any machine with Docker:
+
+```bash
+cd /Users/devbulchandani/DevGraph
+
+# Start all services
+docker-compose -f docker-compose.prod.yml up -d
+
+# View logs
+docker-compose -f docker-compose.prod.yml logs -f
+
+# Stop services
+docker-compose -f docker-compose.prod.yml down
+```
+
+**Includes:**
+- Backend API (port 4000)
+- Frontend (port 80)  
+- FalkorDB (port 6379)
+
+Access at: `http://localhost`
+
+### Manual AWS Deployment (Alternative)
+
+If CDK permissions remain blocked, deploy manually:
+
+1. **Create EC2 instance** (t3.medium, Ubuntu 22.04)
+2. **Upload code**: `scp -r DevGraph ubuntu@ec2-ip:/home/ubuntu/`
+3. **SSH and setup**:
+   ```bash
+   ssh ubuntu@ec2-ip
+   cd DevGraph
+   
+   # Install dependencies
+   curl -fsSL https://deb.nodesource.com/setup_20.x | sudo bash -
+   sudo apt-get install -y nodejs docker.io docker-compose
+   sudo npm install -g pnpm pm2
+   
+   # Start services
+   docker-compose -f docker-compose.prod.yml up -d
+   
+   # Access at http://ec2-ip
+   ```
+
+---
+
+## 📦 Project Structure

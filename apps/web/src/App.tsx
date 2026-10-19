@@ -784,15 +784,27 @@ export default function App() {
                   </h3>
                   {overview?.activeSessions && overview.activeSessions.length > 0 ? (
                     <div className="space-y-3">
-                      {overview.activeSessions.map((s: any) => (
+                      {overview.activeSessions.map((s: any) => {
+                        // Format agent display name
+                        const agentDisplayName = s.agentId
+                          .split('-')
+                          .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+                          .join(' ');
+                        
+                        return (
                         <div
                           key={s.sessionId}
                           className="p-3.5 rounded-lg bg-[#162032] border border-[#1f2937] space-y-2"
                         >
                           <div className="flex items-center justify-between">
-                            <span className="font-mono text-xs font-semibold text-blue-300">
-                              {s.agentId}
-                            </span>
+                            <div className="flex flex-col">
+                              <span className="font-semibold text-sm text-blue-300">
+                                {agentDisplayName}
+                              </span>
+                              <span className="font-mono text-[10px] text-slate-500">
+                                {s.sessionId}
+                              </span>
+                            </div>
                             <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                               {s.status}
                             </span>
@@ -813,7 +825,8 @@ export default function App() {
                             </div>
                           )}
                         </div>
-                      ))}
+                      );
+                      })}
                     </div>
                   ) : (
                     <div className="text-center py-10 text-slate-500 text-xs">

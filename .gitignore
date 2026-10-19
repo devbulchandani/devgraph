@@ -39,3 +39,5 @@ coverage/
 # Local databases and caches
 data/
 *.rdb
+cdk.out/
+.kiro/
